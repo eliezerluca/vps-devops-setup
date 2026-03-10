@@ -274,10 +274,10 @@ Para facilitar o acesso diário, configure um alias no seu arquivo `~/.ssh/confi
 
 ```ini
 Host vps
-  HostName <IP_DA_VPS>
+  HostName 72.61.132.57
   User deploy
   IdentityFile ~/.ssh/vps_deploy
-  Port 22
+  Port 2022
   ServerAliveInterval 60
 ```
 
@@ -285,6 +285,20 @@ Agora você pode acessar com apenas:
 
 ```bash
 ssh vps
+```
+
+### Problema
+
+O problema é específico do Ubuntu 24.04. Nessa versão, o SSH usa socket activation do systemd, e o socket escuta na porta 22 por padrão, ignorando a alteração no sshd_config.
+
+```
+# Desabilita o socket activation e usa o serviço diretamente
+sudo systemctl disable --now ssh.socket
+sudo systemctl enable --now ssh.service
+sudo systemctl restart ssh.service
+
+# Confirma que está escutando na 2022
+sudo ss -tuln | grep 2022
 ```
 
 ---
